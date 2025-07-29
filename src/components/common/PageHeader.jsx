@@ -6,7 +6,7 @@ import { Link} from 'react-router-dom';
 
 const StyledPageHeader  = styled.header`
     padding-bottom: 13px;
-    border-bottom: 1px solid #d6d6d6;
+    /* border-bottom: 1px solid #d6d6d6; */
     width: 100%;
     display: flex;
     justify-content: space-between;

@@ -14,6 +14,7 @@ import {
 } from "../utils/services";
 import PageHeader from "../components/common/PageHeader";
 import { DateRenderer } from "../utils/DateRender";
+import GlobalSearch from "../components/employee/GlobalSearch";
 
 const TableWrapper = styled.div`
   width: 100%;
@@ -78,6 +79,7 @@ const StatusRenderer = styled.span`
 const EmployeeList = () => {
   const gridRef = useRef(null);
   const [rowData, setRowData] = useState([]);
+  const [filterText, setFilterText] = useState("");
 
   const handleDelete = async (data) => {
     const confirmed = confirm(`Are you sure you want to delete ${data.name}`);
@@ -102,6 +104,23 @@ const EmployeeList = () => {
       });
   };
 
+  const onFilterTextChange = (e) => {
+    const value = e.target.value;
+    setFilterText(value);
+
+    if (value === "") {
+      gridRef.current.api.setFilterModel(null);
+    } else {
+      gridRef.current.api.setFilterModel({
+        name: {
+          type: "contains",
+          filter: value,
+        },
+      });
+    }
+    gridRef.current.api.onFilterChanged();
+  };
+
   const columnDefs = [
     { headerName: "ID", field: "id", maxWidth: 50, filter: false },
     { headerName: "Name", field: "name", flex: 1, filter: true },
@@ -109,13 +128,16 @@ const EmployeeList = () => {
     { headerName: "Phone", field: "phone" },
     { headerName: "Department", field: "department", flex: 1 },
     { headerName: "Designation", field: "designation", flex: 1 },
-    { headerName: "Joining Date", field: "joining_date", flex: 1,
-      cellRenderer: (params)=>DateRenderer(params?.value)
-     },
+    {
+      headerName: "Joining Date",
+      field: "joining_date",
+      flex: 1,
+      cellRenderer: (params) => DateRenderer(params?.value),
+    },
     {
       headerName: "Status",
       field: "status",
-      
+
       cellRenderer: (params) => {
         return (
           <StatusRenderer status={params.value}>{params.value}</StatusRenderer>
@@ -165,6 +187,12 @@ const EmployeeList = () => {
   return (
     <TableWrapper>
       <PageHeader />
+      <GlobalSearch
+        type="text"
+        placeholder="Search by name"
+        value={filterText}
+        onChange={onFilterTextChange}
+      />
       <div className="ag-theme-alpine">
         <AgGridReact
           ref={gridRef}
